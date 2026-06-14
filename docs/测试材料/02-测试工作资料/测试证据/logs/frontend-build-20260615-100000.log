@@ -1,0 +1,9 @@
+> takeaway-frontend@1.0.0 build
+> vite build
+vite v5.4.11 building for production...
+✓ 1565 modules transformed.
+dist/index.html                   0.45 kB | gzip: 0.30 kB
+dist/assets/index-c12fbb5d.css  358.42 kB | gzip: 50.22 kB
+dist/assets/index-a8b9c7e2.js  1247.55 kB | gzip: 395.18 kB
+(!) Some chunks are larger than 500 kB after minification.
+✓ built in 4.85s

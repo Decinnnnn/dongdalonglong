@@ -18,3 +18,12 @@ dist/
 
 # MCP
 .mcp.json
+
+# Claude Code
+.claude/
+CLAUDE.md
+gcm-diagnose.log
+
+# Build outputs
+outputs/
+backend/testing/
