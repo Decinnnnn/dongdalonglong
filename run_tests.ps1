@@ -2,8 +2,8 @@ $ErrorActionPreference = "Continue"
 
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Python = if ($env:PYTHON) { $env:PYTHON } else { "python" }
-$LogDir = Join-Path $Root "test-artifacts\logs"
-$CoverageDir = Join-Path $Root "test-artifacts\coverage"
+$LogDir = Join-Path $Root "testing\evidence\logs"
+$CoverageDir = Join-Path $Root "testing\evidence\coverage"
 
 New-Item -ItemType Directory -Force -Path $LogDir, $CoverageDir | Out-Null
 
