@@ -1,0 +1,6 @@
+Node.js v22.22.2 contract tests
+  ok 1 - auth API contract (POST /api/auth/register, POST /api/auth/login)
+  ok 2 - customer API contract (GET dishes, POST order, GET orders, GET addresses)
+  ok 3 - merchant API contract (GET dishes, GET orders)
+  ok 4 - courier API contract (GET available-orders, PUT pickup)
+# 4 passed (142ms)

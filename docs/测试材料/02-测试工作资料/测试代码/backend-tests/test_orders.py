@@ -168,11 +168,8 @@ def test_merchant_can_assign_idle_courier(client, pending_order):
 
 
 @pytest.mark.concurrency
-@pytest.mark.xfail(
-    reason="DEF-001: pickup uses read-then-write without an atomic conditional update",
-    strict=True,
-)
 def test_only_one_courier_can_win_concurrent_pickup(client, pending_order, api_helpers):
+    """DEF-001 已修复：pickup_order 使用原子条件 UPDATE，并发抢单仅一人成功。"""
     courier_b = api_helpers["auth_headers"](client, "courier", "courier-b")
     client.put(
         f"/api/merchant/order/{pending_order['order_id']}/accept",

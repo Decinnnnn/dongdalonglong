@@ -4,11 +4,16 @@
 状态流转：
   抢单: 1 → 2（骑手 0 → 1）
   确认送达: 2 → 3（骑手 1 → 0）
+
+并发控制（DEF-001 修复）：
+  pickup_order 使用带状态条件的原子 UPDATE，通过 rowcount
+  确保多骑手并发抢单时仅一人成功。先读后写已在同一次
+  commit 内被原子条件更新替代。
 """
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -40,7 +45,7 @@ async def list_available_orders(
 
 
 # ══════════════════════════════════════════════════════════════
-# 抢单（1 → 2，骑手 0 → 1）
+# 抢单（1 → 2，骑手 0 → 1）  —— DEF-001 原子化修复
 # ══════════════════════════════════════════════════════════════
 @router.put("/order/{order_id}/pickup", response_model=ApiResponse)
 async def pickup_order(
@@ -49,28 +54,40 @@ async def pickup_order(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    骑手主动抢单：
+    骑手主动抢单（原子条件更新，防并发冲突）：
       - 骑手必须空闲 (status=0)
-      - 订单状态 1 → 2
+      - 使用原子 UPDATE ... WHERE status=1 AND courier_id IS NULL
+      - rowcount=0 → 已被抢走或状态已变
       - 骑手状态 0 → 1
     """
     if courier.status != 0:
         raise HTTPException(status_code=400, detail="您当前忙碌，无法接单")
 
-    order = await db.get(Orders, order_id)
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-    if order.status != 1:
-        raise HTTPException(status_code=400, detail="该订单已被接单或不可抢")
-    if order.courier_id is not None:
+    # 原子条件更新：仅当订单 status=1 且无骑手时才更新
+    # 多骑手并发时，只有一个 UPDATE 能匹配成功（DEF-001 修复核心）
+    result = await db.execute(
+        update(Orders)
+        .where(
+            Orders.id == order_id,
+            Orders.status == 1,
+            Orders.courier_id.is_(None),
+        )
+        .values(status=2, courier_id=courier.id, order_time=datetime.now())
+    )
+    if result.rowcount == 0:
+        # 重新检查订单是否存在
+        order = await db.get(Orders, order_id)
+        if not order:
+            raise HTTPException(status_code=404, detail="订单不存在")
+        if order.status != 1:
+            raise HTTPException(
+                status_code=400,
+                detail="该订单已被接单、取消或不可抢",
+            )
         raise HTTPException(status_code=400, detail="该订单已被其他骑手抢走")
 
-    # 原子化：订单 1→2，骑手 0→1
-    order.status = 2
-    order.courier_id = courier.id
-    order.order_time = datetime.now()
+    # 骑手状态原子化：0 → 1
     courier.status = 1
-
     await db.commit()
 
     return ApiResponse(message="抢单成功，请及时取餐派送")

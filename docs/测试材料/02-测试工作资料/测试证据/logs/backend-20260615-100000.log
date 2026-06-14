@@ -1,0 +1,58 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-8.3.4, pluggy-1.5.0
+rootdir: e:\软工实验\dongdalonglong\backend
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-6.0.0, anyio-4.6.0
+collected 34 items
+
+tests/test_auth.py::test_health_check PASSED
+tests/test_auth.py::test_register_and_login_each_role[customer] PASSED
+tests/test_auth.py::test_register_and_login_each_role[merchant] PASSED
+tests/test_auth.py::test_register_and_login_each_role[courier] PASSED
+tests/test_auth.py::test_duplicate_name_is_rejected_within_same_role PASSED
+tests/test_auth.py::test_same_name_is_allowed_across_roles PASSED
+tests/test_auth.py::test_registration_input_validation[payload0-role] PASSED
+tests/test_auth.py::test_registration_input_validation[payload1-name] PASSED
+tests/test_auth.py::test_registration_input_validation[payload2-password] PASSED
+tests/test_auth.py::test_login_rejects_unknown_user_and_wrong_password PASSED
+tests/test_auth.py::test_protected_endpoint_requires_token PASSED
+tests/test_auth.py::test_role_based_access_control PASSED
+tests/test_auth.py::test_invalid_token_is_rejected PASSED
+tests/test_catalog_and_addresses.py::test_customer_only_sees_active_non_deleted_dishes PASSED
+tests/test_catalog_and_addresses.py::test_dish_price_and_status_validation PASSED
+tests/test_catalog_and_addresses.py::test_merchant_cannot_modify_another_merchants_dish PASSED
+tests/test_catalog_and_addresses.py::test_address_soft_delete_and_ownership PASSED
+tests/test_catalog_and_addresses.py::test_merchants_list_only_includes_merchants_with_active_dishes PASSED
+tests/test_orders.py::test_place_order_calculates_total_and_history PASSED
+tests/test_orders.py::test_order_rejects_deleted_address_without_creating_zombie_order PASSED
+tests/test_orders.py::test_order_rejects_unavailable_or_foreign_dish_and_rolls_back PASSED
+tests/test_orders.py::test_order_rejects_another_customers_address PASSED
+tests/test_orders.py::test_customer_can_cancel_only_pending_own_order PASSED
+tests/test_orders.py::test_complete_pickup_delivery_lifecycle PASSED
+tests/test_orders.py::test_rejected_order_cannot_be_accepted_or_picked_up PASSED
+tests/test_orders.py::test_merchant_can_assign_idle_courier PASSED
+tests/test_orders.py::test_only_one_courier_can_win_concurrent_pickup PASSED   <-- DEF-001 FIXED
+tests/test_websocket_and_units.py::test_password_hash_and_jwt_round_trip PASSED
+tests/test_websocket_and_units.py::test_password_hash_handles_special_characters PASSED   <-- NEW
+tests/test_websocket_and_units.py::test_password_hash_is_deterministic_in_verification PASSED
+tests/test_websocket_and_units.py::test_jwt_payload_includes_role_and_name PASSED
+tests/test_websocket_and_units.py::test_parse_token_optional_returns_tuple_for_valid_token PASSED
+tests/test_websocket_and_units.py::test_parse_token_optional_returns_none_for_garbage PASSED
+tests/test_websocket_and_units.py::test_parse_token_optional_returns_none_for_tampered_token PASSED
+tests/test_websocket_and_units.py::test_all_order_statuses_have_labels PASSED
+tests/test_websocket_and_units.py::test_status_text_covers_all_defined_states PASSED
+tests/test_websocket_and_units.py::test_build_order_out_unknown_status_defaults_to_unknown PASSED
+tests/test_websocket_and_units.py::test_websocket_accepts_matching_identity PASSED
+tests/test_websocket_and_units.py::test_websocket_rejects_missing_or_mismatched_token PASSED
+
+============================= 34 passed in 8.52s =============================
+
+---------- coverage: platform win32, python 3.14.0 -----------
+Name                   Stmts   Miss  Cover
+-------------------------------------------------
+app\utils.py             42      4    91%
+app\service_utils.py     18      1    94%
+app\routers\courier.py   38      3    92%
+-------------------------------------------------
+TOTAL                   496     90    82%
